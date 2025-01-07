@@ -13,7 +13,7 @@ import {
     SidebarFooter,
 } from "@/components/ui/sidebar"
 import { UserButton, useUser } from '@clerk/nextjs'
-import { collectionGroup, query, where, DocumentData } from "firebase/firestore";
+import { collectionGroup, query, where, DocumentData, getDocs, collection } from "firebase/firestore";
 import { useEffect } from "react";
 import { db } from "@/firebase";
 import { useState } from "react";
@@ -45,6 +45,8 @@ export function AppSidebar() {
         editor: [],
     });
 
+    const [data, setData] = useState([]);
+
     const userButtonAppearance = {
         elements: {
           userButtonAvatarBox: "w-8 h-8", // Custom width and height
@@ -56,14 +58,13 @@ export function AppSidebar() {
     useEffect(() => {
         if (user) {
             const userEmail = user.primaryEmailAddress?.emailAddress;
-
             const q = query(
                 collectionGroup(db, "rooms"),
                 where("userId", "==", userEmail)
             );
 
             // Create an observable for the Firestore query
-            const subscription = collectionData(q, { idField: "id" }).subscribe((docs) => {
+            const subscription = collectionData(q, { idField: "id" }).subscribe((docs:[]) => {
                 const ownerGroup: RoomDocument[] = [];
                 const editorGroup: RoomDocument[] = [];
 
